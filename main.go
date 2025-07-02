@@ -3,20 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"os"
 )
 
 type Todo struct {
-	ID        primitive.ObjectID   `json:"id,omitempty" bson:"_id,omitempty"`
-	Completed bool   			   `json:"completed"`
-	Body      string 			   `json:"body"`
+	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Completed bool               `json:"completed"`
+	Body      string             `json:"body"`
 }
 
 var collection *mongo.Collection
@@ -25,13 +25,13 @@ func main() {
 	fmt.Println("Hello World")
 
 	err := godotenv.Load(".env")
-	if err != nil{
+	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
 
 	MONGODB_URI := os.Getenv("MONGODB_URI")
 	clientOptions := options.Client().ApplyURI(MONGODB_URI)
-	client,err := mongo.Connect(context.Background(),clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 
 	if err != nil {
 		log.Fatal(err)
@@ -59,7 +59,7 @@ func main() {
 		port = "5000"
 	}
 
-	log.Fatal(app.Listen("0.0.0.0:"+port))
+	log.Fatal(app.Listen("0.0.0.0:" + port))
 
 }
 
@@ -74,7 +74,7 @@ func getTodos(c *fiber.Ctx) error {
 
 	defer cursor.Close(context.Background())
 
-	for cursor.Next(context.Background()){
+	for cursor.Next(context.Background()) {
 		var todo Todo
 		if err := cursor.Decode(&todo); err != nil {
 			return err
@@ -89,7 +89,7 @@ func createTodo(c *fiber.Ctx) error {
 	todo := new(Todo)
 	// {id:0,completed:false,body:""}
 
-	if err:= c.BodyParser(todo); err != nil {
+	if err := c.BodyParser(todo); err != nil {
 		return err
 	}
 
@@ -98,7 +98,7 @@ func createTodo(c *fiber.Ctx) error {
 
 	}
 
-	insertResult, err := collection.InsertOne(context.Background(),todo)
+	insertResult, err := collection.InsertOne(context.Background(), todo)
 	if err != nil {
 		return err
 	}
@@ -118,8 +118,7 @@ func updateTodo(c *fiber.Ctx) error {
 	filter := bson.M{"_id": objectID}
 	update := bson.M{"$set": bson.M{"completed": true}}
 
-	
-	_,err = collection.UpdateOne(context.Background(),filter,update)
+	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return err
 	}
@@ -128,15 +127,15 @@ func updateTodo(c *fiber.Ctx) error {
 }
 func deleteTodo(c *fiber.Ctx) error {
 	id := c.Params("id")
-	objectID,err := primitive.ObjectIDFromHex(id)
+	objectID, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid todo ID"})
 	}
 
-	filter := bson.M{"_id":objectID}
+	filter := bson.M{"_id": objectID}
 
-	_,err = collection.DeleteOne(context.Background(), filter)
+	_, err = collection.DeleteOne(context.Background(), filter)
 
 	if err != nil {
 		return err
