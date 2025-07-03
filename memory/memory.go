@@ -73,7 +73,6 @@ func memory() {
 
 		return c.Status(404).JSON(fiber.Map{"error": "Todo not found"})
 	})
-
 	// Delete a Todo
 
 	app.Delete("/api/todos/:id", func(c *fiber.Ctx) error {
@@ -88,7 +87,5 @@ func memory() {
 
 		return c.Status(404).JSON(fiber.Map{"error": "Todo not found"})
 	})
-
 	log.Fatal(app.Listen(":" + PORT))
-
 }
