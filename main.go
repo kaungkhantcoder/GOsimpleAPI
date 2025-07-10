@@ -107,6 +107,7 @@ func createTodo(c *fiber.Ctx) error {
 
 	return c.Status(201).JSON(todo)
 }
+
 func updateTodo(c *fiber.Ctx) error {
 	id := c.Params("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
@@ -125,6 +126,7 @@ func updateTodo(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"success": true})
 }
+
 func deleteTodo(c *fiber.Ctx) error {
 	id := c.Params("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
@@ -142,4 +144,5 @@ func deleteTodo(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{"success": true})
+
 }
